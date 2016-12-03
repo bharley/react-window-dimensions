@@ -1,0 +1,5 @@
+.git*
+npm-debug.log
+.idea
+.travis.yml
+yarn.lock
