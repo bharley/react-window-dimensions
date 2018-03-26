@@ -3,7 +3,7 @@
   "version": "1.0.2",
   "main": "./dist/index.js",
   "scripts": {
-    "prepublish": "babel src --out-dir dist",
+    "prepare": "babel src --out-dir dist",
     "lint": "eslint src test",
     "test": "mocha test/.setup.js test/**/*.spec.js"
   },
