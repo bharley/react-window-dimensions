@@ -2,16 +2,19 @@
 
 import React from 'react';
 import { expect } from 'chai';
-import { shallow } from 'enzyme';
+import Enzyme, { shallow } from 'enzyme';
+import Adapter from 'enzyme-adapter-react-16';
 import sinon from 'sinon';
 import debounce from 'lodash.debounce';
 import windowDimensions from '../src';
+
+Enzyme.configure({ adapter: new Adapter() });
 
 const ExampleComponent = ({ a, b, ...props }) => ( // eslint-disable-line no-unused-vars, react/prop-types
   <div {...props}>Hello</div>
 );
 
-const resizeWindow = (width, height) => {
+const resizeWindow = (wrapper, width, height) => {
   // Resize the window
   window.innerWidth = width;
   window.innerHeight = height;
@@ -20,6 +23,9 @@ const resizeWindow = (width, height) => {
   const event = document.createEvent('Event');
   event.initEvent('resize', false, false);
   window.dispatchEvent(event);
+
+  // Update the enzyme wrapper
+  wrapper.update();
 };
 
 const blockingTimeout = time => new Promise((resolve) => {
@@ -81,7 +87,7 @@ describe('windowDimensions', () => {
     wrapper = shallow(<WrappedComponent />);
     expect(wrapper.prop('width')).to.equal(1024);
     expect(wrapper.prop('height')).to.equal(768);
-    resizeWindow(1920, 1080);
+    resizeWindow(wrapper, 1920, 1080);
     expect(wrapper.prop('width')).to.equal(1920);
     expect(wrapper.prop('height')).to.equal(1080);
   });
@@ -124,8 +130,8 @@ describe('windowDimensions', () => {
           },
         })(ExampleComponent);
         wrapper = shallow(<WrappedComponent />);
-        resizeWindow(1920, 1080);
-        resizeWindow(2560, 1440);
+        resizeWindow(wrapper, 1920, 1080);
+        resizeWindow(wrapper, 2560, 1440);
         expect(spy.calledTwice).to.be.true;
       });
 
@@ -138,11 +144,11 @@ describe('windowDimensions', () => {
           },
         })(ExampleComponent);
         wrapper = shallow(<WrappedComponent />);
-        resizeWindow(1920, 1080);
-        resizeWindow(2560, 1440);
+        resizeWindow(wrapper, 1920, 1080);
+        resizeWindow(wrapper, 2560, 1440);
         await blockingTimeout(15);
-        resizeWindow(1920, 1080);
-        resizeWindow(2560, 1440);
+        resizeWindow(wrapper, 1920, 1080);
+        resizeWindow(wrapper, 2560, 1440);
         await blockingTimeout(15);
         expect(spy.calledTwice).to.be.true;
       });
